@@ -68,8 +68,8 @@ public class MyProtocol extends IRDTProtocol {
 
                 Integer[] ack = getNetworkLayer().receivePacket();
 
-                if (ack != null) {
-                    System.out.println(ack[0]+ ack[1]);
+                if (ack != null && ack.length <1) {
+                    System.out.println(ack[0] + ack[1]);
 
                     if (ack[0] == pkt[0] && ack[1] == pkt[1] && ack[0] != packetLast) {
                         acknowledegement = true;
