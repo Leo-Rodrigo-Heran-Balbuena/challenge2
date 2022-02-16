@@ -30,6 +30,7 @@ public class MyProtocol extends IRDTProtocol {
         Integer[] fileContents = Utils.getFileContents(getFileID());
         int packetLast = (int) Math.ceil(100 + ((double) fileContents.length / (double) DATASIZE));
 
+        System.out.println(packetLast);
         int counter = 0;
         int filepointer = 0;
 
@@ -85,7 +86,7 @@ public class MyProtocol extends IRDTProtocol {
     public void TimeoutElapsed(Object tag) {
         int z = (Integer) tag;
         // handle expiration of the timeout:
-        System.out.println("Timer expired with tag = "+z);
+        System.out.println("Timer expired with tag = " + z);
     }
 
     @Override
@@ -115,7 +116,7 @@ public class MyProtocol extends IRDTProtocol {
                 // tell the user
                 System.out.println("Received packet, length = " + packet.length + "  first byte = "+packet[0] );
 
-                packet = new Integer[] {packet[1]};
+                packet = new Integer[] {packet[0]};
 
                 getNetworkLayer().sendPacket(packet);
 
