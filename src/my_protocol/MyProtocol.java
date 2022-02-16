@@ -46,7 +46,7 @@ public class MyProtocol extends IRDTProtocol {
 
             System.out.println("Sent one packet with header = " + pkt[0]);
 
-            filepointer = datalen;
+            filepointer += DATASIZE;
 
             boolean stop = false;
 
