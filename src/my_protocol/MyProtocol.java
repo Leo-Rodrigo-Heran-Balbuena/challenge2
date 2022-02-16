@@ -75,7 +75,7 @@ public class MyProtocol extends IRDTProtocol {
                         acknowledegement = true;
                         counter++;
                     } else if(ack[0] == pkt[0] && ack[0] == packetLast ) {
-                        pkt = new Integer[] {0};
+                        pkt = new Integer[] {0, 0};
                         pkt[0] = 0;
                         acknowledegement = true;
                         getNetworkLayer().sendPacket(pkt);
@@ -151,7 +151,7 @@ public class MyProtocol extends IRDTProtocol {
                 try {
                     Thread.sleep(1000);
                     if (packet == null) {
-                        packet = new Integer[] {0};
+                        packet = new Integer[] {0,0};
                     }
                     getNetworkLayer().sendPacket(packet);
                 } catch (InterruptedException e) {
