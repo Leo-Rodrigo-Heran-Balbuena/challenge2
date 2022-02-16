@@ -129,7 +129,7 @@ public class MyProtocol extends IRDTProtocol {
                 // tell the user
                 System.out.println("Received packet, length = " + packet.length + "  first byte = " + packet[0] );
 
-                packet = new Integer[] {packet[0]};
+                packet = new Integer[] {packet[0], packet[1]};
 
                 if (ack == false) {
                     int oldlength = fileContents.length;
