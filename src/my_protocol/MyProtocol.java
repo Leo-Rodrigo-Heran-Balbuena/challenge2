@@ -45,10 +45,6 @@ public class MyProtocol extends IRDTProtocol {
 
             System.out.println(pkt[0] + "this is before being changed ");
 
-            if (pkt[0] == packetLast) {
-                pkt[0] = 0;
-            }
-
             System.out.println(pkt[0] + "this is after being changed ");
 
             System.arraycopy(fileContents, filepointer, pkt, HEADERSIZE, datalen);
@@ -79,6 +75,9 @@ public class MyProtocol extends IRDTProtocol {
                     } else {
                         getNetworkLayer().sendPacket(pkt);
                         System.out.println("Packet: " + pkt[0] + " is being resent");
+                    } if (ack[0] == packetLast) {
+                        pkt[0] = 0;
+                        getNetworkLayer().sendPacket(pkt);
                     }
                 }
             }
