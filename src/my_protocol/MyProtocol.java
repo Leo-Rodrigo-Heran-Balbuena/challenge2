@@ -48,8 +48,6 @@ public class MyProtocol extends IRDTProtocol {
 
         framework.Utils.Timeout.SetTimeout(1000, this, 28);
 
-        Utils.Timeout.Start();
-
         boolean stop = false;
         while (!stop) {
             try {
