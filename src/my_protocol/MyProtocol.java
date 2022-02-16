@@ -21,15 +21,14 @@ import java.util.Arrays;
 public class MyProtocol extends IRDTProtocol {
 
     // change the following as you wish:
-    static final int HEADERSIZE = 2;   // number of header bytes in each packet
-    static final int DATASIZE = 265;   // max. number of user data bytes in each packet
+    static final int HEADERSIZE = 1;   // number of header bytes in each packet
+    static final int DATASIZE = 128;   // max. number of user data bytes in each packet
 
     @Override
     public void sender() {
 
         Integer[] fileContents = Utils.getFileContents(getFileID());
-        int packetLast = 50 + fileContents.length / DATASIZE;
-        int[] packetData = {packetLast/256, packetLast%256};
+        int packetLast = 100 + fileContents.length / DATASIZE;
 
         System.out.println(packetLast);
 
@@ -43,8 +42,7 @@ public class MyProtocol extends IRDTProtocol {
 
             Integer[] pkt = new Integer[HEADERSIZE + datalen];
 
-            pkt[0] = (50 + counter) / 256;
-            pkt[1] = (50 + counter) % 256;
+            pkt[0] = 100 + counter;
 
             System.arraycopy(fileContents, filepointer, pkt, HEADERSIZE, datalen);
 
@@ -58,8 +56,6 @@ public class MyProtocol extends IRDTProtocol {
 
             while (!acknowledegement) {
 
-
-                Utils.Timeout.SetTimeout(1000, this, (pkt[0]*256 + pkt[1]));
                 int ackCoutner =0;
 
                 try {
@@ -70,24 +66,22 @@ public class MyProtocol extends IRDTProtocol {
 
                 Integer[] ack = getNetworkLayer().receivePacket();
 
-                if (ack != null && ack.length > 1) {
-                    System.out.println(ack[0] + ack[1]);
+                if (ack != null) {
+                    System.out.println(ack[0]);
 
-                    if (ack[0].equals(pkt[0]) && ack[1].equals(pkt[1]) && ack[0] != packetLast) {
+                    if (ack[0] == pkt[0] && ack[0] != packetLast) {
                         acknowledegement = true;
                         counter++;
-
-                    } else if(ack[0].equals(pkt[0])  && ack[0] == packetLast ) {
-                        pkt = new Integer[] {0, 0};
+                    } else if(ack[0] == pkt[0] && ack[0] == packetLast ) {
+                        pkt = new Integer[] {0};
                         pkt[0] = 0;
-                        pkt[1] = 0;
                         acknowledegement = true;
                         getNetworkLayer().sendPacket(pkt);
 
                     } else {
                         if (ackCoutner >= 50){
                             getNetworkLayer().sendPacket(pkt);
-                            System.out.println("Packet: " + pkt[0] + pkt[1] + " is being resent");
+                            System.out.println("Packet: " + pkt[0] + " is being resent");
                         } else {
                             ackCoutner++;
                         }
@@ -133,7 +127,7 @@ public class MyProtocol extends IRDTProtocol {
                 // tell the user
                 System.out.println("Received packet, length = " + packet.length + "  first byte = " + packet[0] );
 
-                packet = new Integer[] {packet[0], packet[1]};
+                packet = new Integer[] {packet[0]};
 
                 if (ack == false) {
                     int oldlength = fileContents.length;
@@ -147,7 +141,8 @@ public class MyProtocol extends IRDTProtocol {
                 ack = true;
                 // append the packet's data part (excluding the header) to the fileContents array, first making it larger
 
-                if (packet[0] == 0 && packet[1] == 0) {
+                if (packet[0] == 0) {
+                    stop =  true;
                     break;
                 }
             } else {
@@ -155,7 +150,7 @@ public class MyProtocol extends IRDTProtocol {
                 try {
                     Thread.sleep(1000);
                     if (packet == null) {
-                        packet = new Integer[] {0,0};
+                        packet = new Integer[] {0};
                     }
                     getNetworkLayer().sendPacket(packet);
                 } catch (InterruptedException e) {
