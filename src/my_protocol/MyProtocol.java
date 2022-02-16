@@ -43,9 +43,13 @@ public class MyProtocol extends IRDTProtocol {
 
             pkt[0] = 100 + counter;
 
-            if (counter == packetLast) {
+            System.out.println(pkt[0] + "this is before being changed ");
+
+            if (pkt[0] == packetLast) {
                 pkt[0] = 0;
             }
+
+            System.out.println(pkt[0] + "this is after being changed ");
 
             System.arraycopy(fileContents, filepointer, pkt, HEADERSIZE, datalen);
 
@@ -129,6 +133,7 @@ public class MyProtocol extends IRDTProtocol {
 
                 if (packet[0] == 0) {
                     stop =  true;
+                    break;
                 }
             } else {
                 // wait ~10ms (or however long the OS makes us wait) before trying again
