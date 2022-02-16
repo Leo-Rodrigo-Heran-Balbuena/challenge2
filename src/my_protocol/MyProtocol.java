@@ -28,7 +28,7 @@ public class MyProtocol extends IRDTProtocol {
     public void sender() {
 
         Integer[] fileContents = Utils.getFileContents(getFileID());
-        int packetLast = (int) Math.ceil(100 + ((double) fileContents.length /(double)  DATASIZE));
+        int packetLast = 100 + fileContents.length / DATASIZE;
 
         System.out.println(packetLast);
         int counter = 0;
