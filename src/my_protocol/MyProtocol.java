@@ -105,7 +105,7 @@ public class MyProtocol extends IRDTProtocol {
             if (packet != null) {
 
                 // tell the user
-                System.out.println("Received packet, length = " +packet.length+ "  first byte = "+packet[0] );
+                System.out.println("Received packet, length = " + packet.length + "  first byte = "+packet[0] );
 
                 // append the packet's data part (excluding the header) to the fileContents array, first making it larger
                 int oldlength = fileContents.length;
@@ -116,11 +116,15 @@ public class MyProtocol extends IRDTProtocol {
                 // and let's just hope the file is now complete
                 stop = true;
 
-            }else{
+            } else {
                 // wait ~10ms (or however long the OS makes us wait) before trying again
                 try {
+                    Thread.sleep(100);
+                    if (packet == null) {
+                        packet = new Integer[] {0};
+                    }
+
                     getNetworkLayer().sendPacket(packet);
-                    Thread.sleep(10);
                 } catch (InterruptedException e) {
                     stop = true;
                 }
