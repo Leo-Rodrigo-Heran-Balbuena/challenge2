@@ -71,12 +71,13 @@ public class MyProtocol extends IRDTProtocol {
                 if (ack != null && ack.length <1) {
                     System.out.println(ack[0] + ack[1]);
 
-                    if (ack[0] == pkt[0] && ack[1] == pkt[1] && ack[0] != packetLast) {
+                    if (ack[0].equals(pkt[0]) && ack[1].equals(pkt[1]) && ack[0] != packetLast) {
                         acknowledegement = true;
                         counter++;
-                    } else if(ack[0] == pkt[0] && ack[0] == packetLast ) {
+                    } else if(ack[0].equals(pkt[0])  && ack[0] == packetLast ) {
                         pkt = new Integer[] {0, 0};
                         pkt[0] = 0;
+                        pkt[1] = 0;
                         acknowledegement = true;
                         getNetworkLayer().sendPacket(pkt);
 
