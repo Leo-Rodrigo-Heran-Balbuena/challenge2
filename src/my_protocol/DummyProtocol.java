@@ -93,7 +93,7 @@ public class DummyProtocol extends IRDTProtocol {
                 // append the packet's data part (excluding the header) to the fileContents array, first making it larger
                 int oldlength=fileContents.length;
                 int datalen= packet.length - HEADERSIZE;
-                fileContents = Arrays.copyOf(fileContents, oldlength+datalen);
+                fileContents = Arrays.copyOf(fileContents, oldlength + datalen);
                 System.arraycopy(packet, HEADERSIZE, fileContents, oldlength, datalen);
 
                 // and let's just hope the file is now complete

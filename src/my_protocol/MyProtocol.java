@@ -59,7 +59,7 @@ public class MyProtocol extends IRDTProtocol {
                 int ackCoutner =0;
 
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(20);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -79,7 +79,7 @@ public class MyProtocol extends IRDTProtocol {
                         getNetworkLayer().sendPacket(pkt);
 
                     } else {
-                        if (ackCoutner >= 10){
+                        if (ackCoutner >= 50){
                             getNetworkLayer().sendPacket(pkt);
                             System.out.println("Packet: " + pkt[0] + " is being resent");
                         } else {
@@ -109,6 +109,8 @@ public class MyProtocol extends IRDTProtocol {
 
         // loop until we are done receiving the file
         boolean stop = false;
+        int counter = 0;
+        boolean ack = false;
         while (!stop) {
 
             // try to receive a packet from the network layer
@@ -127,15 +129,17 @@ public class MyProtocol extends IRDTProtocol {
 
                 packet = new Integer[] {packet[0]};
 
+                if (ack == false) {
+                    int oldlength = fileContents.length;
+                    int datalen = packet.length - HEADERSIZE;
+                    fileContents = Arrays.copyOf(fileContents, oldlength +  datalen);
+                    System.arraycopy(packet, HEADERSIZE, fileContents, oldlength, datalen);
+                }
+
                 getNetworkLayer().sendPacket(packet);
-
                 System.out.println("Ack sent");
-
+                ack = true;
                 // append the packet's data part (excluding the header) to the fileContents array, first making it larger
-                int oldlength = fileContents.length;
-                int datalen = packet.length - HEADERSIZE;
-                fileContents = Arrays.copyOf(fileContents, oldlength +  datalen);
-                System.arraycopy(packet, HEADERSIZE, fileContents, oldlength, datalen);
 
                 if (packet[0] == 0) {
                     stop =  true;
