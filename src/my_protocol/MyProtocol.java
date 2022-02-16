@@ -31,6 +31,7 @@ public class MyProtocol extends IRDTProtocol {
         int packetLast = 100 + fileContents.length / DATASIZE;
 
         System.out.println(packetLast);
+
         int counter = 0;
         int filepointer = 0;
 
@@ -42,10 +43,6 @@ public class MyProtocol extends IRDTProtocol {
             Integer[] pkt = new Integer[HEADERSIZE + datalen];
 
             pkt[0] = 100 + counter;
-
-            System.out.println(pkt[0] + "this is before being changed ");
-
-            System.out.println(pkt[0] + "this is after being changed ");
 
             System.arraycopy(fileContents, filepointer, pkt, HEADERSIZE, datalen);
 
@@ -59,25 +56,35 @@ public class MyProtocol extends IRDTProtocol {
 
             while (!acknowledegement) {
 
+                int ackCoutner =0;
+
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+
                 Integer[] ack = getNetworkLayer().receivePacket();
 
                 if (ack != null) {
                     System.out.println(ack[0]);
 
-                    if (ack[0] == pkt[0]) {
+                    if (ack[0] == pkt[0] && ack[0] != packetLast) {
                         acknowledegement = true;
                         counter++;
-                    } else {
-                        getNetworkLayer().sendPacket(pkt);
-                        System.out.println("Packet: " + pkt[0] + " is being resent");
-                    } if (ack[0] == packetLast) {
+                    } else if(ack[0] == pkt[0] && ack[0] == packetLast ) {
+                        pkt = new Integer[] {0};
                         pkt[0] = 0;
+                        acknowledegement = true;
                         getNetworkLayer().sendPacket(pkt);
+
+                    } else {
+                        if (ackCoutner >= 10){
+                            getNetworkLayer().sendPacket(pkt);
+                            System.out.println("Packet: " + pkt[0] + " is being resent");
+                        } else {
+                            ackCoutner++;
+                        }
                     }
                 }
             }
@@ -110,13 +117,13 @@ public class MyProtocol extends IRDTProtocol {
             // if we indeed received a packet
             if (packet != null) {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
                 // tell the user
-                System.out.println("Received packet, length = " + packet.length + "  first byte = "+packet[0] );
+                System.out.println("Received packet, length = " + packet.length + "  first byte = " + packet[0] );
 
                 packet = new Integer[] {packet[0]};
 
