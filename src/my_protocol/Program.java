@@ -13,6 +13,7 @@ import java.io.InputStream;
  * Entry point of the program. Starts the client and links the used MAC
  * protocol.
  *
+ *
  * @author Jaco ter Braak & Frans van Dijk, University of Twente
  * @version 12-02-2018
  */

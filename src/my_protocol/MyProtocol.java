@@ -112,9 +112,6 @@ public class MyProtocol extends IRDTProtocol {
                 fileContents = Arrays.copyOf(fileContents, oldlength +  datalen);
                 System.arraycopy(packet, HEADERSIZE, fileContents, oldlength, datalen);
 
-                // and let's just hope the file is now complete
-                stop = true;
-
             } else {
                 // wait ~10ms (or however long the OS makes us wait) before trying again
                 try {
@@ -122,7 +119,6 @@ public class MyProtocol extends IRDTProtocol {
                     if (packet == null) {
                         packet = new Integer[] {0};
                     }
-
                     getNetworkLayer().sendPacket(packet);
                 } catch (InterruptedException e) {
                     stop = true;
