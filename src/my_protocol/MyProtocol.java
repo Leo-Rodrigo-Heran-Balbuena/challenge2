@@ -28,39 +28,53 @@ public class MyProtocol extends IRDTProtocol {
 
     @Override
     public void sender() {
-        System.out.println("Sending...");
+
+        boolean resent = false;
 
         Integer[] fileContents = Utils.getFileContents(getFileID());
 
-        int filePointer = 0;
+        for (int filepointer = 0; filepointer < fileContents.length; filepointer++) {
 
-        int datalen = Math.min(DATASIZE, fileContents.length - filePointer);
+            System.out.println("Sending...");
 
-        Integer[] pkt = new Integer[HEADERSIZE + datalen];
+            int datalen = Math.min(DATASIZE, fileContents.length - filepointer);
 
-        pkt[0] = 123 + counter;
+            Integer[] pkt = new Integer[HEADERSIZE + datalen];
 
-        System.arraycopy(fileContents, filePointer, pkt, HEADERSIZE, datalen);
+            pkt[0] = 100 + filepointer;
 
-        getNetworkLayer().sendPacket(pkt);
+            System.arraycopy(fileContents, filepointer, pkt, HEADERSIZE, datalen);
 
-        System.out.println("Sent one packet with header = "+pkt[0]);
+            // sending the packet
+            getNetworkLayer().sendPacket(pkt);
+            resent = false;
 
-        framework.Utils.Timeout.SetTimeout(1000, this, 28);
-        Utils.Timeout.Start();
-        boolean stop = false;
-        while (!stop) {
-            try {
-                Thread.sleep(100);
-                Integer[] ack = getNetworkLayer().receivePacket();
+            System.out.println("Sent one packet with header = " + pkt[0]);
 
-                if (ack != pkt) {
-                    getNetworkLayer().sendPacket(pkt);
+            boolean stop = false;
+
+            while (!stop) {
+                try {
+                    boolean acknowledegement = false;
+
+                    while (!acknowledegement) {
+
+                        Thread.sleep(1000);
+                        Integer[] ack = getNetworkLayer().receivePacket();
+                        if (ack == pkt) {
+                            acknowledegement = true;
+                        } else {
+                            getNetworkLayer().sendPacket(pkt);
+                            System.out.println("Packet: " + pkt[0] + "is being resent");
+                            resent = true;
+                        }
+                    }
+
+                } catch (InterruptedException e) {
+                    stop = true;
                 }
-            } catch (InterruptedException e) {
-                stop = true;
-                counter++;
             }
+
         }
     }
 
