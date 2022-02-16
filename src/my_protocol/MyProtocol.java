@@ -22,7 +22,7 @@ public class MyProtocol extends IRDTProtocol {
 
     // change the following as you wish:
     static final int HEADERSIZE = 2;   // number of header bytes in each packet
-    static final int DATASIZE = 128;   // max. number of user data bytes in each packet
+    static final int DATASIZE = 265;   // max. number of user data bytes in each packet
 
     @Override
     public void sender() {
@@ -58,6 +58,8 @@ public class MyProtocol extends IRDTProtocol {
 
             while (!acknowledegement) {
 
+
+                Utils.Timeout.SetTimeout(1000, this, (pkt[0]*256 + pkt[1]));
                 int ackCoutner =0;
 
                 try {
@@ -74,6 +76,7 @@ public class MyProtocol extends IRDTProtocol {
                     if (ack[0].equals(pkt[0]) && ack[1].equals(pkt[1]) && ack[0] != packetLast) {
                         acknowledegement = true;
                         counter++;
+
                     } else if(ack[0].equals(pkt[0])  && ack[0] == packetLast ) {
                         pkt = new Integer[] {0, 0};
                         pkt[0] = 0;
