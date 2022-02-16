@@ -24,30 +24,31 @@ public class MyProtocol extends IRDTProtocol {
     static final int HEADERSIZE = 1;   // number of header bytes in each packet
     static final int DATASIZE = 128;   // max. number of user data bytes in each packet
 
+    int counter = 0;
+
     @Override
     public void sender() {
         System.out.println("Sending...");
 
-        // read from the input file
         Integer[] fileContents = Utils.getFileContents(getFileID());
 
-        // keep track of where we are in the data
         int filePointer = 0;
 
-        // create a new packet of appropriate size
         int datalen = Math.min(DATASIZE, fileContents.length - filePointer);
+
         Integer[] pkt = new Integer[HEADERSIZE + datalen];
-        // write something random into the header byte
-        pkt[0] = 123;
-        // copy databytes from the input file into data part of the packet, i.e., after the header
+
+        pkt[0] = 123 + counter;
+
         System.arraycopy(fileContents, filePointer, pkt, HEADERSIZE, datalen);
 
-        // send the packet to the network layer
         getNetworkLayer().sendPacket(pkt);
+
         System.out.println("Sent one packet with header = "+pkt[0]);
 
-        // schedule a timer for 1000 ms into the future, just to show how that works:
         framework.Utils.Timeout.SetTimeout(1000, this, 28);
+
+        Utils.Timeout.Start();
 
         // wait for acknoledgement
         // re-send packet if timeout
@@ -64,6 +65,7 @@ public class MyProtocol extends IRDTProtocol {
                 }
             } catch (InterruptedException e) {
                 stop = true;
+                counter++;
             }
         }
 
