@@ -46,6 +46,7 @@ public class MyProtocol extends IRDTProtocol {
 
             System.out.println("Sent one packet with header = " + pkt[0]);
 
+            System.out.println(pkt);
             filepointer += DATASIZE;
 
             boolean stop = false;
@@ -111,6 +112,12 @@ public class MyProtocol extends IRDTProtocol {
                 int datalen = packet.length - HEADERSIZE;
                 fileContents = Arrays.copyOf(fileContents, oldlength +  datalen);
                 System.arraycopy(packet, HEADERSIZE, fileContents, oldlength, datalen);
+                System.out.println(packet);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                            e.printStackTrace();
+                }
 
             } else {
                 // wait ~10ms (or however long the OS makes us wait) before trying again
