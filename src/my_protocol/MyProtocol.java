@@ -28,7 +28,7 @@ public class MyProtocol extends IRDTProtocol {
     public void sender() {
 
         Integer[] fileContents = Utils.getFileContents(getFileID());
-        int packetLast = 100 + ( fileContents.length /  DATASIZE);
+        int packetLast = (int) Math.ceil(100 + ((double) fileContents.length /(double)  DATASIZE));
 
         System.out.println(packetLast);
         int counter = 0;
@@ -44,7 +44,7 @@ public class MyProtocol extends IRDTProtocol {
             pkt[0] = 100 + counter;
 
             if (counter == packetLast) {
-                pkt[0] = 1;
+                pkt[0] = 0;
             }
 
             System.arraycopy(fileContents, filepointer, pkt, HEADERSIZE, datalen);
@@ -59,7 +59,6 @@ public class MyProtocol extends IRDTProtocol {
 
             while (!acknowledegement) {
 
-                Utils.Timeout.SetTimeout(10000, this, pkt[0]);
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -128,7 +127,7 @@ public class MyProtocol extends IRDTProtocol {
                 fileContents = Arrays.copyOf(fileContents, oldlength +  datalen);
                 System.arraycopy(packet, HEADERSIZE, fileContents, oldlength, datalen);
 
-                if (packet[0] == 1) {
+                if (packet[0] == 0) {
                     stop =  true;
                 }
             } else {
