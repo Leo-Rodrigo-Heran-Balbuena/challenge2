@@ -26,7 +26,7 @@ public class Program {
     private static int file = 1;
 
     // Change to your protocol implementation
-    private static IRDTProtocol protocolImpl = new DummyProtocol();
+    private static IRDTProtocol protocolImpl = new MyProtocol();
 
     // Challenge server address
     // See the website for the hostname of the server

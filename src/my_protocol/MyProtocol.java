@@ -50,14 +50,10 @@ public class MyProtocol extends IRDTProtocol {
 
         Utils.Timeout.Start();
 
-        // wait for acknoledgement
-        // re-send packet if timeout
-
-        // and loop and sleep; you may use this loop to check for incoming acks...
         boolean stop = false;
         while (!stop) {
             try {
-                Thread.sleep(10);
+                Thread.sleep(100);
                 Integer[] ack = getNetworkLayer().receivePacket();
 
                 if (ack != pkt) {
@@ -68,7 +64,6 @@ public class MyProtocol extends IRDTProtocol {
                 counter++;
             }
         }
-
     }
 
     @Override
