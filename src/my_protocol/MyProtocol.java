@@ -43,7 +43,7 @@ public class MyProtocol extends IRDTProtocol {
             pkt[0] = 100 + counter;
 
             if (counter == packetLast) {
-                pkt[0] = 0;
+                pkt[0] = 1;
             }
 
             System.arraycopy(fileContents, filepointer, pkt, HEADERSIZE, datalen);
@@ -128,7 +128,7 @@ public class MyProtocol extends IRDTProtocol {
                 fileContents = Arrays.copyOf(fileContents, oldlength +  datalen);
                 System.arraycopy(packet, HEADERSIZE, fileContents, oldlength, datalen);
 
-                if (packet[0] == 0) {
+                if (packet[0] == 1) {
                     stop =  true;
                 }
             } else {
