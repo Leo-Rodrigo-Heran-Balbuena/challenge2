@@ -19,14 +19,14 @@ import java.io.InputStream;
 public class Program {
 
     // Change to your group authentication token
-    private static String groupToken = "get-your-key-from-the-website";
+    private static String groupToken = "320da09e-9aae-4fcd-8863-558c43fdaffc";
 
     // Choose ID of test file to transmit: 1, 2, 3, 4, 5 or 6
     // Sizes in bytes are: 248, 2085, 6267, 21067, 53228, 141270
     private static int file = 1;
 
     // Change to your protocol implementation
-    private static IRDTProtocol protocolImpl = new MyProtocol();
+    private static IRDTProtocol protocolImpl = new DummyProtocol();
 
     // Challenge server address
     // See the website for the hostname of the server

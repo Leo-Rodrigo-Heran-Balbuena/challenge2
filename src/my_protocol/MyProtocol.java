@@ -21,8 +21,8 @@ import java.util.Arrays;
 public class MyProtocol extends IRDTProtocol {
 
     // change the following as you wish:
-    static final int HEADERSIZE=1;   // number of header bytes in each packet
-    static final int DATASIZE=128;   // max. number of user data bytes in each packet
+    static final int HEADERSIZE = 1;   // number of header bytes in each packet
+    static final int DATASIZE = 128;   // max. number of user data bytes in each packet
 
     @Override
     public void sender() {
@@ -38,22 +38,30 @@ public class MyProtocol extends IRDTProtocol {
         int datalen = Math.min(DATASIZE, fileContents.length - filePointer);
         Integer[] pkt = new Integer[HEADERSIZE + datalen];
         // write something random into the header byte
-        pkt[0] = 123;    
+        pkt[0] = 123;
         // copy databytes from the input file into data part of the packet, i.e., after the header
         System.arraycopy(fileContents, filePointer, pkt, HEADERSIZE, datalen);
 
         // send the packet to the network layer
         getNetworkLayer().sendPacket(pkt);
-        System.out.println("Sent one packet with header="+pkt[0]);
+        System.out.println("Sent one packet with header = "+pkt[0]);
 
         // schedule a timer for 1000 ms into the future, just to show how that works:
         framework.Utils.Timeout.SetTimeout(1000, this, 28);
+
+        // wait for acknoledgement
+        // re-send packet if timeout
 
         // and loop and sleep; you may use this loop to check for incoming acks...
         boolean stop = false;
         while (!stop) {
             try {
                 Thread.sleep(10);
+                Integer[] ack = getNetworkLayer().receivePacket();
+
+                if (ack != pkt) {
+                    getNetworkLayer().sendPacket(pkt);
+                }
             } catch (InterruptedException e) {
                 stop = true;
             }
@@ -63,9 +71,9 @@ public class MyProtocol extends IRDTProtocol {
 
     @Override
     public void TimeoutElapsed(Object tag) {
-        int z=(Integer)tag;
+        int z = (Integer) tag;
         // handle expiration of the timeout:
-        System.out.println("Timer expired with tag="+z);
+        System.out.println("Timer expired with tag = "+z);
     }
 
     @Override
@@ -88,20 +96,21 @@ public class MyProtocol extends IRDTProtocol {
             if (packet != null) {
 
                 // tell the user
-                System.out.println("Received packet, length="+packet.length+"  first byte="+packet[0] );
+                System.out.println("Received packet, length = " +packet.length+ "  first byte = "+packet[0] );
 
                 // append the packet's data part (excluding the header) to the fileContents array, first making it larger
-                int oldlength=fileContents.length;
-                int datalen= packet.length - HEADERSIZE;
+                int oldlength = fileContents.length;
+                int datalen = packet.length - HEADERSIZE;
                 fileContents = Arrays.copyOf(fileContents, oldlength+datalen);
                 System.arraycopy(packet, HEADERSIZE, fileContents, oldlength, datalen);
 
                 // and let's just hope the file is now complete
-                stop=true;
+                stop = true;
 
             }else{
                 // wait ~10ms (or however long the OS makes us wait) before trying again
                 try {
+                    getNetworkLayer().sendPacket(packet);
                     Thread.sleep(10);
                 } catch (InterruptedException e) {
                     stop = true;
