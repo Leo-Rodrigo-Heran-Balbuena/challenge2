@@ -28,6 +28,7 @@ public class MyProtocol extends IRDTProtocol {
     public void sender() {
 
         Integer[] fileContents = Utils.getFileContents(getFileID());
+        int packetLast = (int) Math.ceil(100 + ((double) fileContents.length / (double) DATASIZE));
 
         int counter = 0;
         int filepointer = 0;
@@ -40,6 +41,10 @@ public class MyProtocol extends IRDTProtocol {
             Integer[] pkt = new Integer[HEADERSIZE + datalen];
 
             pkt[0] = 100 + counter;
+
+            if (counter == packetLast) {
+                pkt[0] = 0;
+            }
 
             System.arraycopy(fileContents, filepointer, pkt, HEADERSIZE, datalen);
 
@@ -67,7 +72,7 @@ public class MyProtocol extends IRDTProtocol {
 
                     if (ack[0] == pkt[0]) {
                         acknowledegement = true;
-                        counter ++;
+                        counter++;
                     } else {
                         getNetworkLayer().sendPacket(pkt);
                         System.out.println("Packet: " + pkt[0] + " is being resent");
@@ -111,7 +116,7 @@ public class MyProtocol extends IRDTProtocol {
                 // tell the user
                 System.out.println("Received packet, length = " + packet.length + "  first byte = "+packet[0] );
 
-                packet = new Integer[] {packet[0]};
+                packet = new Integer[] {packet[1]};
 
                 getNetworkLayer().sendPacket(packet);
 
@@ -123,6 +128,9 @@ public class MyProtocol extends IRDTProtocol {
                 fileContents = Arrays.copyOf(fileContents, oldlength +  datalen);
                 System.arraycopy(packet, HEADERSIZE, fileContents, oldlength, datalen);
 
+                if (packet[0] == 0) {
+                    stop =  true;
+                }
             } else {
                 // wait ~10ms (or however long the OS makes us wait) before trying again
                 try {
