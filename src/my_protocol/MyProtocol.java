@@ -107,6 +107,8 @@ public class MyProtocol extends IRDTProtocol {
 
                 getNetworkLayer().sendPacket(packet);
 
+                System.out.println("Ack sent");
+
                 // append the packet's data part (excluding the header) to the fileContents array, first making it larger
                 int oldlength = fileContents.length;
                 int datalen = packet.length - HEADERSIZE;
