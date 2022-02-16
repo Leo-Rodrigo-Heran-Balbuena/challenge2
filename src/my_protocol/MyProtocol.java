@@ -24,17 +24,14 @@ public class MyProtocol extends IRDTProtocol {
     static final int HEADERSIZE = 1;   // number of header bytes in each packet
     static final int DATASIZE = 128;   // max. number of user data bytes in each packet
 
-    int counter = 0;
-
     @Override
     public void sender() {
 
-        boolean resent = false;
-
         Integer[] fileContents = Utils.getFileContents(getFileID());
 
-        for (int filepointer = 0; filepointer < fileContents.length; filepointer++) {
+        int filepointer = 0;
 
+        while (filepointer < fileContents.length) {
             System.out.println("Sending...");
 
             int datalen = Math.min(DATASIZE, fileContents.length - filepointer);
@@ -45,11 +42,11 @@ public class MyProtocol extends IRDTProtocol {
 
             System.arraycopy(fileContents, filepointer, pkt, HEADERSIZE, datalen);
 
-            // sending the packet
             getNetworkLayer().sendPacket(pkt);
-            resent = false;
 
             System.out.println("Sent one packet with header = " + pkt[0]);
+
+            filepointer = datalen;
 
             boolean stop = false;
 
@@ -61,12 +58,11 @@ public class MyProtocol extends IRDTProtocol {
 
                         Thread.sleep(1000);
                         Integer[] ack = getNetworkLayer().receivePacket();
-                        if (ack == pkt) {
+                        if (ack[0] == pkt[0]) {
                             acknowledegement = true;
                         } else {
                             getNetworkLayer().sendPacket(pkt);
                             System.out.println("Packet: " + pkt[0] + "is being resent");
-                            resent = true;
                         }
                     }
 
@@ -74,7 +70,6 @@ public class MyProtocol extends IRDTProtocol {
                     stop = true;
                 }
             }
-
         }
     }
 
@@ -107,10 +102,14 @@ public class MyProtocol extends IRDTProtocol {
                 // tell the user
                 System.out.println("Received packet, length = " + packet.length + "  first byte = "+packet[0] );
 
+                packet = new Integer[] {packet[0]};
+
+                getNetworkLayer().sendPacket(packet);
+
                 // append the packet's data part (excluding the header) to the fileContents array, first making it larger
                 int oldlength = fileContents.length;
                 int datalen = packet.length - HEADERSIZE;
-                fileContents = Arrays.copyOf(fileContents, oldlength+datalen);
+                fileContents = Arrays.copyOf(fileContents, oldlength +  datalen);
                 System.arraycopy(packet, HEADERSIZE, fileContents, oldlength, datalen);
 
                 // and let's just hope the file is now complete
