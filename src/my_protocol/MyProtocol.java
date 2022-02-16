@@ -70,7 +70,7 @@ public class MyProtocol extends IRDTProtocol {
 
                 Integer[] ack = getNetworkLayer().receivePacket();
 
-                if (ack != null && ack.length <1) {
+                if (ack != null && ack.length > 1) {
                     System.out.println(ack[0] + ack[1]);
 
                     if (ack[0].equals(pkt[0]) && ack[1].equals(pkt[1]) && ack[0] != packetLast) {
