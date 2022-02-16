@@ -21,14 +21,15 @@ import java.util.Arrays;
 public class MyProtocol extends IRDTProtocol {
 
     // change the following as you wish:
-    static final int HEADERSIZE = 1;   // number of header bytes in each packet
+    static final int HEADERSIZE = 2;   // number of header bytes in each packet
     static final int DATASIZE = 128;   // max. number of user data bytes in each packet
 
     @Override
     public void sender() {
 
         Integer[] fileContents = Utils.getFileContents(getFileID());
-        int packetLast = 100 + fileContents.length / DATASIZE;
+        int packetLast = 50 + fileContents.length / DATASIZE;
+        int[] packetData = {packetLast/256, packetLast%256};
 
         System.out.println(packetLast);
 
@@ -42,7 +43,8 @@ public class MyProtocol extends IRDTProtocol {
 
             Integer[] pkt = new Integer[HEADERSIZE + datalen];
 
-            pkt[0] = 100 + counter;
+            pkt[0] = (50 + counter) / 256;
+            pkt[1] = (50 + counter) % 256;
 
             System.arraycopy(fileContents, filepointer, pkt, HEADERSIZE, datalen);
 
@@ -67,9 +69,9 @@ public class MyProtocol extends IRDTProtocol {
                 Integer[] ack = getNetworkLayer().receivePacket();
 
                 if (ack != null) {
-                    System.out.println(ack[0]);
+                    System.out.println(ack[0]+ ack[1]);
 
-                    if (ack[0] == pkt[0] && ack[0] != packetLast) {
+                    if (ack[0] == pkt[0] && ack[1] == pkt[1] && ack[0] != packetLast) {
                         acknowledegement = true;
                         counter++;
                     } else if(ack[0] == pkt[0] && ack[0] == packetLast ) {
@@ -81,7 +83,7 @@ public class MyProtocol extends IRDTProtocol {
                     } else {
                         if (ackCoutner >= 50){
                             getNetworkLayer().sendPacket(pkt);
-                            System.out.println("Packet: " + pkt[0] + " is being resent");
+                            System.out.println("Packet: " + pkt[0] + pkt[1] + " is being resent");
                         } else {
                             ackCoutner++;
                         }
@@ -141,8 +143,7 @@ public class MyProtocol extends IRDTProtocol {
                 ack = true;
                 // append the packet's data part (excluding the header) to the fileContents array, first making it larger
 
-                if (packet[0] == 0) {
-                    stop =  true;
+                if (packet[0] == 0 && packet[1] == 0) {
                     break;
                 }
             } else {
