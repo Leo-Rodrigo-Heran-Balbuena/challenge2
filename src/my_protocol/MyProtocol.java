@@ -47,7 +47,7 @@ public class MyProtocol extends IRDTProtocol {
         System.out.println("Sent one packet with header = "+pkt[0]);
 
         framework.Utils.Timeout.SetTimeout(1000, this, 28);
-
+        Utils.Timeout.Start();
         boolean stop = false;
         while (!stop) {
             try {
